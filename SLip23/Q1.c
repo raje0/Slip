@@ -2,29 +2,36 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <dirent.h>
 
-int main(int argc, char *argv[])
+int main()
 {
-    if (argc < 2)
+    struct dirent *entry;
+    int fileCount = 0;
+
+    DIR *directory = opendir(".");
+    if (directory == NULL)
     {
-        printf("Usage: %s <file1> <file2> ...\n", argv[0]);
+        perror("Unable to open the directory");
         return 1;
     }
-    int i;
-    for (i = 1; i < argc; i++)
+
+    printf("Files in the current directory:\n");
+    while ((entry = readdir(directory)) != NULL)
     {
-        if (access(argv[i], F_OK) == 0)
+        if (entry->d_name[0] != '.')
         {
-            printf("%s: Found\n", argv[i]);
-        }
-        else
-        {
-            printf("%s: Not Found\n", argv[i]);
+            printf("%s\n", entry->d_name);
+            fileCount++;
         }
     }
+
+    closedir(directory);
+
+    printf("\nTotal number of files: %d\n", fileCount);
 
     return 0;
 }
+
 
 
